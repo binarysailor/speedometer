@@ -1,0 +1,39 @@
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<script src="p5.min.js"></script>
+		<script src="meters.js"></script>
+		<style>
+
+			#pedals {
+				width: 100%;
+				margin-top: 30px;
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: center;
+			}
+			#brake, #accel {
+				width: 200px;
+				height: 200px;
+				background-color: cadetblue;
+				display: inline-block;
+				border-radius: 10px;
+				margin: 20px;
+			}
+			#brake:hover, #accel:hover {
+				border: 1px solid red;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="meters"></div>
+		<div id="pedals">
+			<div id="brake">
+			</div>
+			<div id="accel">
+				
+			</div>
+		</div>
+	</body>
+</html>
