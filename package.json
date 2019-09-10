@@ -1,0 +1,22 @@
+{
+  "name": "speedometer",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "scripts": {
+    "build": "rm -rf dist && webpack && cp src/index.html dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/binarysailor/speedometer.git"
+  },
+  "author": "binarysailor",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/binarysailor/speedometer/issues"
+  },
+  "homepage": "https://github.com/binarysailor/speedometer#readme",
+  "devDependencies": {
+    "webpack-cli": "^3.3.8"
+  }
+}
