@@ -1,4 +1,105 @@
-function Meter(start, stop, step, x ,y, r) {
+function Car() {
+    this.speed = 0;
+    this.revs = 0;
+    this.gear = 1;
+
+    this.maxSpeed = 298;
+    this.maxRevs = 8000;
+
+    this.acceleratePressed = false;
+    this.brakePressed = false;
+
+    this.revs2speedRatio = 25;
+
+    this.speedometer = new Meter(0, this.maxSpeed, 20, 0, 0, 0, "speedometer");
+    this.tachometer = new Meter(0, this.maxRevs, 1, 0, 0, 0, "tachometer");
+
+}
+
+Car.prototype.pressAccelerate = () => {
+    this.acceleratePressed = true;
+};
+
+Car.prototype.pressBrake = () => {
+    this.brakePressed = true;
+}
+
+Car.prototype.releasePedals = () => {
+    this.acceleratePressed = false;
+    this.brakePressed = false;
+}
+
+Car.prototype.update = () => {
+    if (this.acceleratePressed) {
+        this.revs += this.calculateRevsIncrement();
+        this.revs = Math.min(this.revs, this.maxRevs);
+        this.revs2Speed();
+    } else {
+        if (this.brakePressed) {
+            this.speed -= 2;
+        } else {
+            this.speed -= 0.12;
+        }
+        this.speed = Math.min(this.speed, this.maxSpeed);
+        this.speed = Math.max(this.speed, 0);
+        this.speed2Revs();
+    } 
+}
+
+Car.prototype.calculateRevsIncrement = () => {
+    let maxIncrement = 20;
+    let factor = 1.0;
+
+    if (this.revs < 1400) {
+        factor = 0.6;
+    } else if (this.revs < 4000) {
+        factor = 0.8;
+    } else if (this.revs < 6000) {
+        factor = 1.0;
+    } else {
+        factor = 0.7;
+    }
+
+    if (this.speed < 90) {
+
+    } else if (speed < 120) {
+        factor *= 0.8;
+    } else if (speed < 150) {
+        factor *= 0.7;
+    } else if (speed < 200) {
+        factor *= 0.6;
+    } else {
+        factor *= 0.5;
+    }
+
+    return maxIncrement * factor;
+};
+
+Car.prototype.speed2Revs = () => {
+    return this.speed * this.revs2speedRatio;
+}
+
+Car.prototype.revs2Speed = () => {
+    return this.revs / this.revs2speedRatio;
+}
+
+function Meter(start, stop, step, x, y, r, parentId) {
+    const m = this;
+    new p5(s => {
+        s.setup = () => {
+            let e = document.getElementById(parentId);
+            let rect = e.getBoundingClientRect();
+            s.createCanvas(rect.width, rect.height);
+        }
+        s.draw = () => {
+            let ox = s.width / 2;
+            let oy = s.height / 2;
+            s.stroke(0);
+            s.circle(ox, oy, Math.min(s.width, s.height));
+        }
+    }, parentId);
+
+
     this.WIDTH = r;
     this.HEIGHT = r;
     this.numbers = [];
@@ -6,56 +107,64 @@ function Meter(start, stop, step, x ,y, r) {
     this.oy = y;
     this.currentValue = 0;
     this.digitalDisplay = false;
-    while(start <= stop) {
+    while (start <= stop) {
         this.numbers.push(start);
         start += step;
     }
     if ((stop - start) % step != 0) {
         this.numbers.push(stop);
     }
+
 };
 
-Meter.prototype.draw = function() {
+Meter.prototype.draw = function (s) {
+
+
+
+    speedometer.setValue(speed);
+    revmeter.setValue(revs);
+    speedometer.draw();
+    revmeter.draw();
 
     // the arc
-    strokeWeight(1);
-    stroke(0);
-    arc(this.ox, this.oy, this.WIDTH, this.HEIGHT, PI, 0, OPEN);
+    s.strokeWeight(1);
+    s.stroke(0);
+    s.arc(this.ox, this.oy, this.WIDTH, this.HEIGHT, PI, 0, OPEN);
     if (this.digitalDisplay) {
-        fill(255);
-        textSize(26);
-        text(Math.floor(this.currentValue), this.ox, this.oy*0.5);
+        s.fill(255);
+        s.textSize(26);
+        s.text(Math.floor(this.currentValue), this.ox, this.oy * 0.5);
     }
-    fill(0);
-    rect(this.ox - this.WIDTH/2, this.oy, this.WIDTH, this.HEIGHT / 10);
+    s.fill(0);
+    s.rect(this.ox - this.WIDTH / 2, this.oy, this.WIDTH, this.HEIGHT / 10);
 
     // the scale
     for (let i = 0; i < this.numbers.length; i++) {
         let angle = PI * this.numbers[i] / this.maxValue();
-        let {x, y} = this.coords(angle, 0.8);
-        textSize(12);
-        fill(255);
-        textAlign(CENTER);
-        text(this.numbers[i], x, y);
+        let { x, y } = this.coords(angle, 0.8);
+        s.textSize(12);
+        s.fill(255);
+        s.textAlign(CENTER);
+        s.text(this.numbers[i], x, y);
     }
 
     // pointer
     {
         let angle = PI * this.currentValue / this.maxValue();
-        stroke(255, 0, 0);
-        strokeWeight(3)
-        let {x, y} = this.coords(angle, 0.78);
-        line(this.ox, this.oy, x, y);
-        fill(0);
-        circle(this.ox, this.oy, 20);
+        s.stroke(255, 0, 0);
+        s.strokeWeight(3)
+        let { x, y } = this.coords(angle, 0.78);
+        s.line(this.ox, this.oy, x, y);
+        s.fill(0);
+        s.circle(this.ox, this.oy, 20);
     }
 };
 
-Meter.prototype.maxValue = function() {
+Meter.prototype.maxValue = function () {
     return this.numbers[this.numbers.length - 1];
 };
 
-Meter.prototype.coords = function(angle, rcoeff) {
+Meter.prototype.coords = function (angle, rcoeff) {
     if (!rcoeff) {
         rcoeff = 1;
     }
@@ -67,71 +176,13 @@ Meter.prototype.coords = function(angle, rcoeff) {
     };
 };
 
-Meter.prototype.setValue = function(val) {
+Meter.prototype.setValue = function (val) {
     this.currentValue = val;
 };
 
-Meter.prototype.setDigitalDisplay = function(onoff) {
+Meter.prototype.setDigitalDisplay = function (onoff) {
     this.digitalDisplay = onoff;
 };
-
-let screenDimensions = {};
-
-const maxSpeed = 298;
-const maxRevs = 9;
-let speedometer;
-let revmeter;
-speed = 0;
-revs = 0;
-let accelPressed = false;
-let brakePressed = false;
-
-
-function setup() {
-    screenDimensions.width = displayWidth;
-    screenDimensions.height = displayHeight;
-    let cv = createCanvas(displayWidth, displayHeight/2);
-    cv.parent("meters");
-    speedometer = new Meter(0, maxSpeed, 20, width * 0.24, width * 0.21, width * 0.44);
-    speedometer.setDigitalDisplay(true);
-    revmeter = new Meter(0, maxRevs, 1, width * 0.76, width * 0.21, width * 0.44);
-}
-
-function draw() {
-    if (accelPressed) {
-        speed += acceleration();
-    } else if (brakePressed) {
-        speed -= 2;
-    } else {
-        speed -= 0.12;
-    }
-    speed = Math.max(speed, 0);
-    speed = Math.min(speed, maxSpeed);
-
-    revs = speed / maxSpeed;
-    revs = Math.min(revs * maxRevs);
-
-    speedometer.setValue(speed);
-    revmeter.setValue(revs);
-    speedometer.draw();
-    revmeter.draw();
-}
-
-function acceleration() {
-    let accel = 1;
-    let factor = 1;
-    if (speed < 50) {
-    } else if (speed < 100) {
-        factor = 0.8;
-    } else if (speed < 140) {
-        factor = 0.6;
-    } else if (speed < 200) {
-        factor = 0.4;
-    } else {
-        factor = 0.3;
-    }
-    return accel * factor;
-}
 
 window.onload = () => {
     for (const event of ['mousedown', 'touchstart']) {
@@ -149,4 +200,6 @@ window.onload = () => {
             brakePressed = false;
         });
     }
+
+    new Car();
 };

@@ -13,6 +13,11 @@
 				align-items: center;
 				justify-content: center;
 			}
+			#speedometer, #tachometer {
+				width: 48%;
+				display: inline-block;
+
+			}
 			#brake, #accel {
 				width: 200px;
 				height: 200px;
@@ -27,12 +32,16 @@
 		</style>
 	</head>
 	<body>
-		<div id="meters"></div>
+		<div id="meters">
+			<div id="speedometer">
+			</div>
+			<div id="tachometer">
+			</div>
+		</div>
 		<div id="pedals">
 			<div id="brake">
 			</div>
 			<div id="accel">
-				
 			</div>
 		</div>
 	</body>
