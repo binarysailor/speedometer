@@ -1,37 +1,106 @@
+<!DOCTYPE html>
 <html>
-	<head>
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<script src="p5.min.js"></script>
-		<script src="meters.js"></script>
-		<style>
+
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<script src="p5.min.js"></script>
+	<script src="meters.js"></script>
+	<style>
+		#content {
+			margin: auto;
+			display: flex;
+			height: 100%;
+			flex-direction: row;
+			align-content: center;
+			justify-content: center;
+		}
+
+		#meters {
+			display: flex;
+			flex-direction: row;
+			width: 60%;
+			align-content: center;
+			justify-content: center;
+		}
+
+		#pedals {
+			width: 38%;
+			display: inline-flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: center;
+		}
+
+		#speedometer,
+		#tachometer {
+			width: 48%;
+			display: inline-flex;
+			flex-direction: row;
+			align-items: center;
+
+		}
+
+		#brake,
+		#accel {
+			width: 45%;
+			height: 200px;
+			border-radius: 10px;
+			margin: 10px;
+		}
+
+		#accel {
+			background-color: blue;
+		}
+
+		#brake {
+			background-color: pink;
+		}
+
+		#brake:hover,
+		#accel:hover {
+			cursor: pointer;
+		}
+
+		@media (orientation: portrait) {
+			#content {
+				flex-direction: column;
+				justify-content: space-between;
+			}
+
+			#meters {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				width: 100%;
+			}
+
+			#speedometer,
+			#tachometer {
+				width: 55%;
+			}
 
 			#pedals {
 				width: 100%;
-				margin-top: 30px;
-				display: flex;
-				flex-direction: row;
-				align-items: center;
-				justify-content: center;
 			}
-			#speedometer, #tachometer {
-				width: 48%;
-				display: inline-block;
 
+			#brake,
+			#accel {
+				height: 130px;
 			}
-			#brake, #accel {
-				width: 200px;
-				height: 200px;
-				background-color: cadetblue;
-				display: inline-block;
-				border-radius: 10px;
-				margin: 20px;
+		}
+
+		@media (max-aspect-ratio:2/3) {
+
+			#speedometer,
+			#tachometer {
+				width: 65%;
 			}
-			#brake:hover, #accel:hover {
-				border: 1px solid red;
-			}
-		</style>
-	</head>
-	<body>
+		}
+	</style>
+</head>
+
+<body>
+	<div id="content">
 		<div id="meters">
 			<div id="speedometer">
 			</div>
@@ -44,5 +113,7 @@
 			<div id="accel">
 			</div>
 		</div>
-	</body>
+	</div>
+</body>
+
 </html>
