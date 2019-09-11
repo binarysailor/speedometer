@@ -57,6 +57,22 @@ Meter.prototype.draw = function (s) {
         }
     }
 
+    // brake control
+    if (this.config.controls) {
+        const CONTROL_SIZE = 30;
+        const CONTROL_GAP = 5;
+        const controls = this.config.controls.filter(c => c.on);
+        const count = controls.length;
+        const xsize = count * CONTROL_SIZE + (count - 1) * CONTROL_GAP;
+        const x = origin.x - xsize / 2;
+        for (const control of controls) {
+            s.push();
+            s.translate(x, origin.y + 80);
+            control.draw(s, CONTROL_SIZE);
+            s.pop();
+        }
+    }
+
     // the pointer
     {
         const angle = this.angle(this.currentValue, s);

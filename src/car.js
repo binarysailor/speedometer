@@ -14,12 +14,28 @@ function Car() {
 
     this.revs2speedRatio = 25;
 
+    this.brakeControl = {
+        on: false,
+        draw: (s, size) => {
+            s.stroke('#ff0000');
+            s.strokeWeight(2);
+            s.fill(0);
+            s.circle(0,size/2,size * 0.95);
+            s.noFill();
+            s.arc(0, size/2, size+5, size+5, Math.PI-Math.PI/4, Math.PI+Math.PI/4);
+            s.arc(0, size/2, size+5, size+5, -Math.PI/4, Math.PI/4);
+            s.line(0, 6, 0, size - 12);
+            s.line(0, size - 7, 0, size - 6);
+        }
+    };
+
     const speedometerConfig = {
         min: 0,
         max: 298, // yes, 298. That's my son's request...
         step: 20,
         minAngle: -20 / 16 * Math.PI,
-        maxAngle: 4 / 16 * Math.PI
+        maxAngle: 4 / 16 * Math.PI,
+        controls: [ this.brakeControl ]
     };
     this.speedometer = new Meter(speedometerConfig, "speedometer");
 
@@ -36,10 +52,12 @@ function Car() {
 
 Car.prototype.pressAccelerate = function() {
     this.acceleratePressed = true;
+    this.brakeControl.on = false;
 };
 
 Car.prototype.pressBrake = function() {
     this.brakePressed = true;
+    this.brakeControl.on = true;
 }
 
 Car.prototype.releasePedals = function() {

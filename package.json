@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/binarysailor/speedometer#readme",
   "devDependencies": {
+    "webpack": "4",
     "webpack-cli": "^3.3.8"
   }
 }
