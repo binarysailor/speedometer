@@ -24,8 +24,11 @@ function Car() {
             s.noFill();
             s.arc(0, size/2, size+5, size+5, Math.PI-Math.PI/4, Math.PI+Math.PI/4);
             s.arc(0, size/2, size+5, size+5, -Math.PI/4, Math.PI/4);
-            s.line(0, 6, 0, size - 12);
-            s.line(0, size - 7, 0, size - 6);
+            s.strokeWeight(1);
+            s.textSize(size - 5);
+            s.fill('#ff0000');
+            s.textAlign(s.CENTER);
+            s.text('!',0,size - 5);
         }
     };
 

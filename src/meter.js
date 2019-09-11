@@ -38,7 +38,7 @@ Meter.prototype.draw = function (s) {
     }
 
     // the scale
-    s.textSize(18);
+    s.textSize(side / 18);
     s.fill(255);
     s.textAlign(s.CENTER);
     let value = this.config.min;
@@ -57,17 +57,17 @@ Meter.prototype.draw = function (s) {
         }
     }
 
-    // brake control
+    // controls
     if (this.config.controls) {
-        const CONTROL_SIZE = 30;
-        const CONTROL_GAP = 5;
+        const CONTROL_SIZE = side / 12;
+        const CONTROL_GAP = 4;
         const controls = this.config.controls.filter(c => c.on);
         const count = controls.length;
         const xsize = count * CONTROL_SIZE + (count - 1) * CONTROL_GAP;
         const x = origin.x - xsize / 2;
         for (const control of controls) {
             s.push();
-            s.translate(x, origin.y + 80);
+            s.translate(x, origin.y + side / 4);
             control.draw(s, CONTROL_SIZE);
             s.pop();
         }
