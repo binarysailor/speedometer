@@ -20,15 +20,15 @@ function Car() {
             s.stroke('#ff0000');
             s.strokeWeight(2);
             s.fill(0);
-            s.circle(0,size/2,size * 0.95);
+            s.circle(0, size / 2, size * 0.95);
             s.noFill();
-            s.arc(0, size/2, size+5, size+5, Math.PI-Math.PI/4, Math.PI+Math.PI/4);
-            s.arc(0, size/2, size+5, size+5, -Math.PI/4, Math.PI/4);
+            s.arc(0, size / 2, size + 5, size + 5, Math.PI - Math.PI / 4, Math.PI + Math.PI / 4);
+            s.arc(0, size / 2, size + 5, size + 5, -Math.PI / 4, Math.PI / 4);
             s.strokeWeight(1);
-            s.textSize(size - 5);
+            s.textSize(size - 6);
             s.fill('#ff0000');
-            s.textAlign(s.CENTER);
-            s.text('!',0,size - 5);
+            s.textAlign(s.CENTER, s.CENTER);
+            s.text('!', 0, size / 2);
         }
     };
 
@@ -38,7 +38,7 @@ function Car() {
         step: 20,
         minAngle: -20 / 16 * Math.PI,
         maxAngle: 4 / 16 * Math.PI,
-        controls: [ this.brakeControl ]
+        controls: [this.brakeControl]
     };
     this.speedometer = new Meter(speedometerConfig, "speedometer");
 
@@ -53,22 +53,22 @@ function Car() {
     this.tachometer = new Meter(tachometerConfig, "tachometer");
 }
 
-Car.prototype.pressAccelerate = function() {
+Car.prototype.pressAccelerate = function () {
     this.acceleratePressed = true;
     this.brakeControl.on = false;
 };
 
-Car.prototype.pressBrake = function() {
+Car.prototype.pressBrake = function () {
     this.brakePressed = true;
     this.brakeControl.on = true;
 }
 
-Car.prototype.releasePedals = function() {
+Car.prototype.releasePedals = function () {
     this.acceleratePressed = false;
     this.brakePressed = false;
 }
 
-Car.prototype.update = function() {
+Car.prototype.update = function () {
     if (this.acceleratePressed) {
         this.revs += this.calculateRevsIncrement();
         this.revs = util.constrain(this.revs, 0, this.maxRevs);
@@ -87,7 +87,7 @@ Car.prototype.update = function() {
     this.tachometer.setValue(this.revs);
 }
 
-Car.prototype.calculateRevsIncrement = function() {
+Car.prototype.calculateRevsIncrement = function () {
     let maxIncrement = 20;
     let factor = 1.0;
 
@@ -118,7 +118,7 @@ Car.prototype.calculateRevsIncrement = function() {
     return maxIncrement * factor;
 };
 
-Car.prototype.calculateNaturalSpeedDecrement = function() {
+Car.prototype.calculateNaturalSpeedDecrement = function () {
     let minDecrement = 0.12;
     let factor = 1.0;
 
@@ -137,11 +137,11 @@ Car.prototype.calculateNaturalSpeedDecrement = function() {
     return minDecrement * factor;
 }
 
-Car.prototype.speed2Revs = function() {
+Car.prototype.speed2Revs = function () {
     this.revs = this.speed * this.revs2speedRatio;
 };
 
-Car.prototype.revs2Speed = function() {
+Car.prototype.revs2Speed = function () {
     this.speed = this.revs / this.revs2speedRatio;
 };
 

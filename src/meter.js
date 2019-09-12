@@ -39,16 +39,37 @@ Meter.prototype.draw = function (s) {
 
     // the scale
     s.textSize(side / 18);
+    s.stroke(255);
     s.fill(255);
-    s.textAlign(s.CENTER);
+    s.textAlign(s.CENTER, s.CENTER);
+
+    let previousValue;
     let value = this.config.min;
     while (value <= this.config.max) {
         const label = this.config.displayTransform ? Math.round(this.config.displayTransform(value)).toString() : value.toString();
         const angle = this.angle(value, s);
-        const { x, y } = this.coords(angle, 0.8, s);
+        const { x, y } = this.coords(angle, 0.74, s);
+        s.strokeWeight(1);
         s.text(label, x, y);
 
+        // thicker line at labelled steps
+        s.strokeWeight(3);
+        let { x: x1, y: y1 } = this.coords(angle, 0.86, s);
+        let { x: x2, y: y2 } = this.coords(angle, 0.93, s);
+        s.line(x1, y1, x2, y2);
+
+        // thinner line between labelled steps
+        if (previousValue !== undefined) {
+            const interAngle = this.angle(previousValue + this.config.step / 2, s);
+            s.strokeWeight(2);
+            let { x: x1, y: y1 } = this.coords(interAngle, 0.89, s);
+            let { x: x2, y: y2 } = this.coords(interAngle, 0.93, s);
+            s.line(x1, y1, x2, y2);
+        }
+
         const anotherStepPossible = value < this.config.max;
+
+        previousValue = value;
         value += this.config.step;
         if (anotherStepPossible) {
             // even though we might have stepped above the max, let's limit it to the max and do one more turn
@@ -78,7 +99,7 @@ Meter.prototype.draw = function (s) {
         const angle = this.angle(this.currentValue, s);
         s.stroke(255, 0, 0);
         s.strokeWeight(3)
-        let { x, y } = this.coords(angle, 0.78, s);
+        let { x, y } = this.coords(angle, 0.9, s);
         s.line(origin.x, origin.y, x, y);
         s.fill(0);
         s.circle(origin.x, origin.y, 20);
