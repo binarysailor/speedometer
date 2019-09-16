@@ -68,16 +68,16 @@ Car.prototype.releasePedals = function () {
     this.brakePressed = false;
 }
 
-Car.prototype.update = function () {
+Car.prototype.update = function (duration) {
     if (this.acceleratePressed) {
-        this.revs += this.calculateRevsIncrement();
+        this.revs += this.calculateRevsIncrement(duration);
         this.revs = util.constrain(this.revs, 0, this.maxRevs);
         this.revs2Speed();
     } else {
         if (this.brakePressed) {
-            this.speed -= 2;
+            this.speed -= this.calculateBrakingSpeedDecrement(duration);
         } else {
-            this.speed -= this.calculateNaturalSpeedDecrement();
+            this.speed -= this.calculateNaturalSpeedDecrement(duration);
         }
         this.speed = util.constrain(this.speed, 0, this.maxSpeed);
         this.speed2Revs();
@@ -87,8 +87,8 @@ Car.prototype.update = function () {
     this.tachometer.setValue(this.revs);
 }
 
-Car.prototype.calculateRevsIncrement = function () {
-    let maxIncrement = 20;
+Car.prototype.calculateRevsIncrement = function (duration) {
+    let maxIncrement = duration;
     let factor = 1.0;
 
     if (this.revs < 1400) {
@@ -118,8 +118,12 @@ Car.prototype.calculateRevsIncrement = function () {
     return maxIncrement * factor;
 };
 
-Car.prototype.calculateNaturalSpeedDecrement = function () {
-    let minDecrement = 0.12;
+Car.prototype.calculateBrakingSpeedDecrement = function (duration) {
+    return duration / 25;
+}
+
+Car.prototype.calculateNaturalSpeedDecrement = function (duration) {
+    let minDecrement = duration / 150;
     let factor = 1.0;
 
     if (this.speed < 90) {

@@ -17,8 +17,14 @@ window.onload = () => {
         });
     }
 
+    let previousTime;
     const timerHandler = () => {
-        car.update();
+        const now = new Date().getTime();
+        if (previousTime) {
+            const duration = now - previousTime;
+            car.update(duration);
+        }
+        previousTime = now;
         setTimeout(timerHandler, 20);
     };
 
