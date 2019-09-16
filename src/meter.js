@@ -98,9 +98,13 @@ Meter.prototype.draw = function (s) {
     {
         const angle = this.angle(this.currentValue, s);
         s.stroke(255, 0, 0);
-        s.strokeWeight(3)
-        let { x, y } = this.coords(angle, 0.9, s);
-        s.line(origin.x, origin.y, x, y);
+        s.strokeWeight(3);
+        s.fill('red');
+        s.circle(origin.x, origin.y, 22);
+        let tip = this.coords(angle, 0.9, s);
+        let base1 = this.coords(angle + Math.PI / 2, 0.05, s);
+        let base2 = this.coords(angle - Math.PI / 2, 0.05, s);
+        s.triangle(base1.x, base1.y, tip.x, tip.y, base2.x, base2.y);
         s.fill(0);
         s.circle(origin.x, origin.y, 20);
     }
