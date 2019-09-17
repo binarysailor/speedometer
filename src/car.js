@@ -82,11 +82,11 @@ Car.prototype.update = function (duration) {
             this.speed = util.constrain(this.speed, 0, this.maxSpeed);
             this.revs = this.gearbox.speedToRevs(this.speed);
         }
-        this.gearbox.update(duration, this.speed, this.revs);
     } else {
         this.revs = this.gearbox.switch.revs();
-        this.speed = this.gearbox.revsToSpeed(this.revs);
+        this.speed = this.gearbox.switch.speed();
     }
+    this.gearbox.update(duration, this.speed, this.revs);
 
     this.speedometer.setValue(this.speed);
     this.tachometer.setValue(this.revs);

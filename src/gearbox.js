@@ -43,9 +43,37 @@ Gearbox.prototype.revsToSpeed = function(revs) {
 }
 
 Gearbox.prototype.update = function(duration, speed, revs) {
-    if (revs > 6000 && this.canShiftUp()) {
+    if (revs > 6000 && !this.isSwitching() && this.canShiftUp()) {
         this.shiftUp();
+        this.switch = new GearSwitch(revs, this.speedToRevs(speed), speed, new Date().getTime());
+    } else if (revs < 1500 && !this.isSwitching() && this.canShiftDown()) {
+        this.shiftDown();
+        this.switch = new GearSwitch(revs, this.speedToRevs(speed), speed, new Date().getTime());
+    } else if (this.isSwitching() && this.switch.progress() >= 1) {
+        this.switch = null;
     }
 }
 
+function GearSwitch(startRevs, targetRevs, speed, startTime) {
+    this.startRevs = startRevs;
+    this.startSpeed = speed;
+    this.targetRevs = targetRevs;
+    this.startTime = startTime;
+
+    this.switchTime = 200; // ms
+}
+
+GearSwitch.prototype.revs = function() {
+    return this.startRevs + this.progress() * (this.targetRevs - this.startRevs);
+}
+
+GearSwitch.prototype.speed = function() {
+    return this.startSpeed * (1 + Math.sign(this.startRevs - this.targetRevs) * 0.05 * this.progress());
+} 
+
+GearSwitch.prototype.progress = function() {
+    return Math.min((new Date().getTime() - this.startTime) / this.switchTime, 1.0);
+}
+
 export default Gearbox;
+
