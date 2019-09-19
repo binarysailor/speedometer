@@ -7,8 +7,8 @@ function Car() {
     this.revs = 0;
     this.gearbox = new Gearbox();
 
-    this.maxSpeed = 298;
-    this.maxRevs = 8000;
+    this.maxSpeed = 298;  // yes, 298. That's my son's request...
+    this.maxRevs = 9000;
 
     this.acceleratePressed = false;
     this.brakePressed = false;
@@ -33,7 +33,7 @@ function Car() {
 
     const speedometerConfig = {
         min: 0,
-        max: 298, // yes, 298. That's my son's request...
+        max: this.maxSpeed,
         step: 20,
         minAngle: -20 / 16 * Math.PI,
         maxAngle: 4 / 16 * Math.PI,
@@ -41,13 +41,25 @@ function Car() {
     };
     this.speedometer = new Meter(speedometerConfig, "speedometer");
 
+
+    this.gearControl = {
+        on: true,
+        draw: (s, size) => {
+            s.stroke('yellow');
+            s.fill('yellow');
+            s.textSize(size - 8);
+            s.textAlign(s.CENTER, s.CENTER);
+            s.text(this.gearbox.gear, 0, size / 2);
+        }
+    }
     const tachometerConfig = {
         min: 0,
-        max: 8000,
+        max: this.maxRevs,
         step: 1000,
         minAngle: -18 / 16 * Math.PI,
         maxAngle: 2 / 16 * Math.PI,
-        displayTransform: revs => revs / 1000
+        displayTransform: revs => revs / 1000,
+        controls: [this.gearControl]
     };
     this.tachometer = new Meter(tachometerConfig, "tachometer");
 }
@@ -68,24 +80,29 @@ Car.prototype.releasePedals = function () {
 }
 
 Car.prototype.update = function (duration) {
-    if (!this.gearbox.switch) {
-        if (this.acceleratePressed) {
+    if (this.acceleratePressed) {
+        if (!this.gearbox.isSwitching()) {
             this.revs += this.calculateRevsIncrement(duration);
             this.revs = util.constrain(this.revs, 0, this.maxRevs);
             this.speed = this.gearbox.revsToSpeed(this.revs);
-        } else {
-            if (this.brakePressed) {
-                this.speed -= this.calculateBrakingSpeedDecrement(duration);
-            } else {
-                this.speed -= this.calculateNaturalSpeedDecrement(duration);
+            if (this.speed > this.maxSpeed) {
+                this.speed = this.maxSpeed;
+                this.revs = this.gearbox.speedToRevs(this.speed, null, null);
             }
-            this.speed = util.constrain(this.speed, 0, this.maxSpeed);
-            this.revs = this.gearbox.speedToRevs(this.speed);
+        } else {
+            this.speed -= this.calculateNaturalSpeedDecrement(duration);
+            this.revs = this.gearbox.speedToRevs(this.speed, this.revs, duration);
         }
+    } else if (this.brakePressed) {
+        this.speed -= this.calculateBrakingSpeedDecrement(duration);
+        this.speed = util.constrain(this.speed, 0, this.maxSpeed);
+        this.revs = this.gearbox.speedToRevs(this.speed, this.revs, duration);
     } else {
-        this.revs = this.gearbox.switch.revs();
-        this.speed = this.gearbox.switch.speed();
+        this.speed -= this.calculateNaturalSpeedDecrement(duration);
+        this.speed = util.constrain(this.speed, 0, this.maxSpeed);
+        this.revs = this.gearbox.speedToRevs(this.speed, this.revs, duration);
     }
+
     this.gearbox.update(duration, this.speed, this.revs);
 
     this.speedometer.setValue(this.speed);
@@ -118,7 +135,7 @@ Car.prototype.calculateBrakingSpeedDecrement = function (duration) {
 }
 
 Car.prototype.calculateNaturalSpeedDecrement = function (duration) {
-    let minDecrement = duration / 150;
+    let minDecrement = duration / 350;
     let factor = 1.0;
 
     // factor in the air resistance
@@ -139,12 +156,5 @@ Car.prototype.calculateNaturalSpeedDecrement = function (duration) {
     return minDecrement * factor;
 }
 
-Car.prototype.speed2Revs = function () {
-    this.revs = this.speed * this.revs2speedRatio;
-};
-
-Car.prototype.revs2Speed = function () {
-    this.speed = this.revs / this.revs2speedRatio;
-};
 
 export default Car;

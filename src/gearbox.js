@@ -34,8 +34,32 @@ Gearbox.prototype.isSwitching = function() {
     return this.switch != null;
 }
 
-Gearbox.prototype.speedToRevs = function(speed) {
-    return REVS_TO_SPEED_RATIOS[this.gear - 1] * speed;
+Gearbox.prototype.speedToRevs = function(speed, previousRevs, duration) {
+    if (!this.isSwitching()) {
+        return REVS_TO_SPEED_RATIOS[this.gear - 1] * speed;
+    } else {
+        let revs;
+        if (this.switch.switchDirection > 0) {
+            // switching gear up
+            revs = previousRevs - this.switch.revsChangeRate * duration;
+            const targetGearRatio = REVS_TO_SPEED_RATIOS[this.gear - 1];
+            if (revs / targetGearRatio <= speed) {
+                // the switch is over
+                revs = speed * targetGearRatio;
+                this.switch = null;
+            }
+        } else {
+            // switching gear down
+            revs = previousRevs + this.switch.revsChangeRate * duration;
+            const targetGearRatio = REVS_TO_SPEED_RATIOS[this.gear - 1];
+            if (revs / targetGearRatio >= speed) {
+                // the switch is over
+                revs = speed * targetGearRatio;
+                this.switch = null;
+            }
+        }
+        return revs;
+    }
 }
 
 Gearbox.prototype.revsToSpeed = function(revs) {
@@ -45,35 +69,19 @@ Gearbox.prototype.revsToSpeed = function(revs) {
 Gearbox.prototype.update = function(duration, speed, revs) {
     if (revs > 6000 && !this.isSwitching() && this.canShiftUp()) {
         this.shiftUp();
-        this.switch = new GearSwitch(revs, this.speedToRevs(speed), speed, new Date().getTime());
+        this.switch = new GearSwitch(revs, REVS_TO_SPEED_RATIOS[this.gear - 1] * speed);
     } else if (revs < 1500 && !this.isSwitching() && this.canShiftDown()) {
         this.shiftDown();
-        this.switch = new GearSwitch(revs, this.speedToRevs(speed), speed, new Date().getTime());
-    } else if (this.isSwitching() && this.switch.progress() >= 1) {
-        this.switch = null;
+        this.switch = new GearSwitch(revs, REVS_TO_SPEED_RATIOS[this.gear - 1] * speed);
     }
 }
 
-function GearSwitch(startRevs, targetRevs, speed, startTime) {
+function GearSwitch(startRevs, targetRevs) {
+    const switchTime = 200; // ms
+
     this.startRevs = startRevs;
-    this.startSpeed = speed;
-    this.targetRevs = targetRevs;
-    this.startTime = startTime;
-
-    this.switchTime = 200; // ms
-}
-
-GearSwitch.prototype.revs = function() {
-    return this.startRevs + this.progress() * (this.targetRevs - this.startRevs);
-}
-
-GearSwitch.prototype.speed = function() {
-    return this.startSpeed * (1 + Math.sign(this.startRevs - this.targetRevs) * 0.05 * this.progress());
-} 
-
-GearSwitch.prototype.progress = function() {
-    return Math.min((new Date().getTime() - this.startTime) / this.switchTime, 1.0);
+    this.revsChangeRate = Math.abs(startRevs - targetRevs) / switchTime;
+    this.switchDirection = Math.sign(startRevs - targetRevs);
 }
 
 export default Gearbox;
-
